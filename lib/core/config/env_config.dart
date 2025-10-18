@@ -37,16 +37,16 @@ class EnvConfig {
   static const EnvConfig production = EnvConfig(
     environment: 'production',
     apiBaseUrl: 'https://totalnba-64d9e912c803.herokuapp.com',
-    enableLogging: false,
+    enableLogging: true, // Enable logging for debugging
     enableCrashReporting: true,
     apiTimeout: 60000, // 60 seconds to match Android app
   );
 
-  /// Current environment (default to development)
+  /// Current environment (default to production)
   /// Can be overridden via --dart-define in build commands
   static const String _currentEnv = String.fromEnvironment(
     'ENV',
-    defaultValue: 'development',
+    defaultValue: 'production',
   );
 
   /// Get the current environment configuration
