@@ -3,9 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/di/injection.dart';
+import 'core/config/env_config.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Log environment configuration
+  debugPrint('=================================');
+  debugPrint('Environment: ${EnvConfig.current.environment}');
+  debugPrint('API Base URL: ${EnvConfig.current.apiBaseUrl}');
+  debugPrint('=================================');
 
   // Initialize dependency injection
   configureDependencies();
