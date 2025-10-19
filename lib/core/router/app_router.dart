@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../presentation/screens/home/home_screen.dart';
-import '../../presentation/screens/predictions/predictions_screen.dart';
+import '../../presentation/screens/splash/splash_screen.dart';
+import '../../presentation/screens/main/main_screen.dart';
 import '../../presentation/screens/match_details/match_details_screen.dart';
-import '../../presentation/screens/player_search/player_search_screen.dart';
 import '../../presentation/screens/results/results_screen.dart';
-import '../../presentation/screens/settings/settings_screen.dart';
-import '../../presentation/widgets/main_scaffold.dart';
 
 /// App route names for type-safe navigation
 class AppRoutes {
-  static const String home = '/';
-  static const String predictions = '/predictions';
-  static const String matchDetails = '/match/:id';
-  static const String playerSearch = '/players';
+  static const String splash = '/';
+  static const String main = '/main';
+  static const String matchDetails = '/match-details/:id';
   static const String results = '/results';
-  static const String settings = '/settings';
 }
 
 /// Global navigation key for programmatic navigation
@@ -24,51 +19,24 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 /// GoRouter configuration for the app
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: AppRoutes.home,
+  initialLocation: AppRoutes.splash,
   debugLogDiagnostics: true,
   routes: [
-    // Main shell route with bottom navigation
-    ShellRoute(
-      builder: (context, state, child) {
-        return MainScaffold(child: child);
-      },
-      routes: [
-        GoRoute(
-          path: AppRoutes.home,
-          name: 'home',
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: const HomeScreen(),
-          ),
-        ),
-        GoRoute(
-          path: AppRoutes.predictions,
-          name: 'predictions',
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: const PredictionsScreen(),
-          ),
-        ),
-        GoRoute(
-          path: AppRoutes.playerSearch,
-          name: 'playerSearch',
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: const PlayerSearchScreen(),
-          ),
-        ),
-        GoRoute(
-          path: AppRoutes.settings,
-          name: 'settings',
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: const SettingsScreen(),
-          ),
-        ),
-      ],
+    // Splash screen route
+    GoRoute(
+      path: AppRoutes.splash,
+      name: 'splash',
+      builder: (context, state) => const SplashScreen(),
     ),
 
-    // Full-screen routes (outside bottom nav shell)
+    // Main screen with bottom navigation
+    GoRoute(
+      path: AppRoutes.main,
+      name: 'main',
+      builder: (context, state) => const MainScreen(),
+    ),
+
+    // Full-screen routes (outside bottom nav)
     GoRoute(
       path: AppRoutes.matchDetails,
       name: 'matchDetails',
@@ -103,8 +71,8 @@ final GoRouter appRouter = GoRouter(
           Text('Page not found: ${state.uri}'),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () => context.go(AppRoutes.home),
-            child: const Text('Go Home'),
+            onPressed: () => context.go(AppRoutes.main),
+            child: const Text('Go to Main'),
           ),
         ],
       ),

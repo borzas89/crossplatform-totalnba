@@ -128,9 +128,20 @@ class PlayerRepositoryImpl implements PlayerRepository {
       final cachedStats = await _database.searchPlayerStats(playerName);
 
       if (cachedStats.isNotEmpty) {
-        _logger.i('Found ${cachedStats.length} players in cache matching: $playerName');
+        _logger.i('Found ${cachedStats.length} player stats in cache matching: $playerName');
+
+        // Deduplicate players by full name (keep only one entry per player)
+        final Map<String, PlayerStat> uniquePlayers = {};
+        for (final stat in cachedStats) {
+          if (!uniquePlayers.containsKey(stat.fullName)) {
+            uniquePlayers[stat.fullName] = stat;
+          }
+        }
+
+        _logger.i('Found ${uniquePlayers.length} unique players after deduplication');
+
         // Convert player stats to player DTO
-        return cachedStats.map((stat) => NbaPlayerDto(
+        return uniquePlayers.values.map((stat) => NbaPlayerDto(
           id: stat.id,
           personId: stat.id, // Use same ID for personId as we don't have separate personId in local DB
           firstName: stat.fullName.split(' ').first,
