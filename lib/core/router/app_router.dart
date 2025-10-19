@@ -81,6 +81,13 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.results,
       name: 'results',
       builder: (context, state) => const ResultsScreen(),
+      builder: (context, state) {
+        final teamName = state.uri.queryParameters['team'];
+        final teamAlias = state.uri.queryParameters['alias'];
+        return ResultsScreen(
+          teamName: teamName,
+        );
+      },
     ),
   ],
 

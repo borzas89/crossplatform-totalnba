@@ -40,4 +40,15 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end
+
+  # Ensure simulator support is enabled
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['SUPPORTED_PLATFORMS'] = 'iphoneos iphonesimulator'
+        config.build_settings['SUPPORTS_MACCATALYST'] = 'NO'
+        config.build_settings['SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD'] = 'NO'
+      end
+    end
+  end
 end
