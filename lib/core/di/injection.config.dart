@@ -16,8 +16,10 @@ import 'package:logger/logger.dart' as _i974;
 import '../../data/network/api_client.dart' as _i927;
 import '../../data/repositories/player_repository_impl.dart' as _i370;
 import '../../data/repositories/prediction_repository_impl.dart' as _i144;
+import '../../data/repositories/result_repository_impl.dart' as _i667;
 import '../../domain/repositories/player_repository.dart' as _i857;
 import '../../domain/repositories/prediction_repository.dart' as _i194;
+import '../../domain/repositories/result_repository.dart' as _i327;
 import 'network_module.dart' as _i567;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -36,6 +38,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(
         () => networkModule.provideDio(gh<_i974.Logger>()));
     gh.factory<_i927.ApiClient>(() => _i927.ApiClient(gh<_i361.Dio>()));
+    gh.factory<_i327.ResultRepository>(() => _i667.ResultRepositoryImpl(
+          gh<_i927.ApiClient>(),
+          gh<_i974.Logger>(),
+        ));
     gh.factory<_i194.PredictionRepository>(() => _i144.PredictionRepositoryImpl(
           gh<_i927.ApiClient>(),
           gh<_i974.Logger>(),

@@ -5,6 +5,7 @@ import '../../core/constants/app_constants.dart';
 import '../models/predicted_match_dto.dart';
 import '../models/player_stat_dto.dart';
 import '../models/nba_player_dto.dart';
+import '../models/result_dto.dart';
 
 part 'api_client.g.dart';
 
@@ -68,5 +69,13 @@ abstract class ApiClient {
   @GET(AppConstants.searchPlayersEndpoint)
   Future<List<NbaPlayerDto>> searchPlayers(
     @Query('name') String playerName,
+  );
+
+  // ===== Results =====
+
+  /// Get all results for a specific team
+  @GET(AppConstants.allResultsByTeamEndpoint)
+  Future<List<ResultDto>> getResultsByTeam(
+    @Query('teamName') String teamName,
   );
 }
