@@ -4,8 +4,10 @@ import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/di/injection.dart';
 import 'core/config/env_config.dart';
+import 'domain/services/player_sync_service.dart';
+import 'presentation/providers/settings_provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Log environment configuration
@@ -15,7 +17,15 @@ void main() {
   debugPrint('=================================');
 
   // Initialize dependency injection
-  configureDependencies();
+  await configureDependencies();
+
+  // Sync player stats in background (don't block app startup)
+  final syncService = getIt<PlayerSyncService>();
+  syncService.syncPlayerStats().then((_) {
+    debugPrint('Player stats sync completed');
+  }).catchError((error) {
+    debugPrint('Player stats sync failed: $error');
+  });
 
   // TODO: Initialize Firebase
   // await Firebase.initializeApp(
@@ -29,16 +39,19 @@ void main() {
   );
 }
 
-class TotalNBAApp extends StatelessWidget {
+class TotalNBAApp extends ConsumerWidget {
   const TotalNBAApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch theme mode from settings
+    final themeMode = ref.watch(appThemeModeProvider);
+
     return MaterialApp.router(
       title: 'TotalNBA',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
     );

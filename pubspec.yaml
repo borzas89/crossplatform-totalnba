@@ -27,6 +27,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.18
   path_provider: ^2.1.1
   path: ^1.8.3
+  shared_preferences: ^2.2.2
 
   # Dependency Injection
   get_it: ^7.6.4
@@ -35,11 +36,11 @@ dependencies:
   # Navigation
   go_router: ^13.0.0
 
-  # Firebase
-  firebase_core: ^2.24.2
-  firebase_messaging: ^14.7.9
-  firebase_analytics: ^10.8.0
-  firebase_crashlytics: ^3.4.8
+  # Firebase (temporarily disabled for iOS compatibility - will re-enable when needed)
+  # firebase_core: ^2.24.2
+  # firebase_messaging: ^14.7.9
+  # firebase_analytics: ^10.8.0
+  # firebase_crashlytics: ^3.4.8
 
   # UI & Images
   cached_network_image: ^3.3.0
