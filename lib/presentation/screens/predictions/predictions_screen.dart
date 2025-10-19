@@ -302,7 +302,10 @@ class _PredictionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dateFormat = DateFormat('MMM dd, yyyy • HH:mm');
+    final timeFormat = DateFormat('HH:mm');
+
+    // Determine which team is predicted to win
+    final homeWinning = (prediction.predictedHomeScore ?? 0) > (prediction.predictedAwayScore ?? 0);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -310,37 +313,38 @@ class _PredictionCard extends StatelessWidget {
         onTap: () {
           context.push('/match-details/${prediction.commonMatchId}');
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date and week
-            if (prediction.matchDate != null)
-              Row(
-                children: [
-                  Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
+            // Time and Game Center label
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Time
+                if (prediction.matchDate != null)
                   Text(
-                    dateFormat.format(prediction.matchDate!),
+                    timeFormat.format(prediction.matchDate!),
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  if (prediction.weekName != null) ...[
-                    const SizedBox(width: 8),
-                    Chip(
-                      label: Text(prediction.weekName!),
-                      labelStyle: const TextStyle(fontSize: 11),
-                      padding: EdgeInsets.zero,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ],
-                ],
-              ),
-            const SizedBox(height: 12),
+                // Game Center label
+                Text(
+                  'Game Center',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
 
             // Teams
             Row(
@@ -350,6 +354,7 @@ class _PredictionCard extends StatelessWidget {
                     teamName: prediction.awayTeamName ?? 'TBD',
                     teamAlias: prediction.awayTeamAlias,
                     score: prediction.predictedAwayScore,
+                    isWinning: !homeWinning && prediction.predictedAwayScore != null,
                     onTap: prediction.awayTeamName != null
                         ? () {
                             final teamName = Uri.encodeComponent(prediction.awayTeamName!);
@@ -362,13 +367,38 @@ class _PredictionCard extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    '@',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.bold,
-                    ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Column(
+                    children: [
+                      Text(
+                        'VS',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: Colors.grey[400],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      // Total score
+                      if (prediction.predictedTotal != null)
+                        Column(
+                          children: [
+                            Text(
+                              prediction.predictedTotal!.toStringAsFixed(0),
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'TOTAL',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -376,6 +406,7 @@ class _PredictionCard extends StatelessWidget {
                     teamName: prediction.homeTeamName ?? 'TBD',
                     teamAlias: prediction.homeTeamAlias,
                     score: prediction.predictedHomeScore,
+                    isWinning: homeWinning && prediction.predictedHomeScore != null,
                     onTap: prediction.homeTeamName != null
                         ? () {
                             final teamName = Uri.encodeComponent(prediction.homeTeamName!);
@@ -390,28 +421,27 @@ class _PredictionCard extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 12),
-            const Divider(),
-            const SizedBox(height: 8),
-
-            // Prediction details
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                if (prediction.spread != null)
-                  _StatChip(
-                    label: 'Spread',
-                    value: prediction.spread! > 0
-                        ? '+${prediction.spread!.toStringAsFixed(1)}'
-                        : prediction.spread!.toStringAsFixed(1),
+            // Spread
+            if (prediction.spread != null) ...[
+              const SizedBox(height: 16),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                if (prediction.predictedTotal != null)
-                  _StatChip(
-                    label: 'Total',
-                    value: prediction.predictedTotal!.toStringAsFixed(1),
+                  child: Text(
+                    'Spread: ${prediction.spread! > 0 ? '+' : ''}${prediction.spread!.toStringAsFixed(1)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
                   ),
-              ],
-            ),
+                ),
+              ),
+            ],
           ],
         ),
         ),
@@ -424,12 +454,14 @@ class _TeamDisplay extends StatelessWidget {
   final String teamName;
   final String? teamAlias;
   final double? score;
+  final bool isWinning;
   final VoidCallback? onTap;
 
   const _TeamDisplay({
     required this.teamName,
     this.teamAlias,
     this.score,
+    this.isWinning = false,
     this.onTap,
   });
 
@@ -437,37 +469,71 @@ class _TeamDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final child = Column(
       children: [
+        // Team Logo
+        if (teamAlias != null)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/images/teams/${teamAlias!.toLowerCase()}.png',
+              width: 48,
+              height: 48,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback to basketball icon if team logo not found
+                // Debug: Print the path that failed
+                print('Failed to load team icon: assets/images/teams/${teamAlias!.toLowerCase()}.png');
+                print('Error: $error');
+                return Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.sports_basketball,
+                    size: 32,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                );
+              },
+            ),
+          ),
+        const SizedBox(height: 8),
+
+        // Team Alias
         if (teamAlias != null)
           Text(
             teamAlias!,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
         const SizedBox(height: 4),
+
+        // Team Name (smaller, below alias)
         Text(
           teamName,
           textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             color: Colors.grey[600],
           ),
         ),
+
+        // Predicted Score
         if (score != null) ...[
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              score!.toStringAsFixed(1),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
+          Text(
+            score!.toStringAsFixed(0),
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: isWinning
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.grey[700],
             ),
           ),
         ],
@@ -486,39 +552,6 @@ class _TeamDisplay extends StatelessWidget {
     }
 
     return child;
-  }
-}
-
-class _StatChip extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _StatChip({
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.grey[600],
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
   }
 }
 
