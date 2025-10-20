@@ -5,8 +5,9 @@ import 'package:intl/intl.dart';
 import '../../providers/prediction_provider.dart';
 import '../../../data/models/predicted_match_dto.dart';
 import '../../widgets/match_analysis_bottom_sheet.dart';
+import '../../widgets/date_selector.dart';
 
-enum PredictionFilter { all, today, upcoming, past }
+enum PredictionFilter { all, today, upcoming, past, byDate }
 
 /// Predictions screen - Shows list of NBA match predictions
 class PredictionsScreen extends ConsumerStatefulWidget {
@@ -18,6 +19,7 @@ class PredictionsScreen extends ConsumerStatefulWidget {
 
 class _PredictionsScreenState extends ConsumerState<PredictionsScreen> {
   PredictionFilter _currentFilter = PredictionFilter.all;
+  DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +46,19 @@ class _PredictionsScreenState extends ConsumerState<PredictionsScreen> {
       ),
       body: Column(
         children: [
+          // Date Selector
+          DateSelector(
+            selectedDate: _selectedDate,
+            onDateSelected: (date) {
+              setState(() {
+                _selectedDate = date;
+                _currentFilter = PredictionFilter.byDate;
+              });
+            },
+          ),
+
           // Filter chips
-          if (_currentFilter != PredictionFilter.all)
+          if (_currentFilter != PredictionFilter.all && _currentFilter != PredictionFilter.byDate)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -113,6 +126,21 @@ class _PredictionsScreenState extends ConsumerState<PredictionsScreen> {
         return predictions
             .where((p) => p.matchDate != null && p.matchDate!.isBefore(now))
             .toList();
+      case PredictionFilter.byDate:
+        final selectedDay = DateTime(
+          _selectedDate.year,
+          _selectedDate.month,
+          _selectedDate.day,
+        );
+        return predictions.where((p) {
+          if (p.matchDate == null) return false;
+          final matchDay = DateTime(
+            p.matchDate!.year,
+            p.matchDate!.month,
+            p.matchDate!.day,
+          );
+          return matchDay.isAtSameMomentAs(selectedDay);
+        }).toList();
     }
   }
 
@@ -187,6 +215,8 @@ class _PredictionsScreenState extends ConsumerState<PredictionsScreen> {
         return Icons.schedule;
       case PredictionFilter.past:
         return Icons.history;
+      case PredictionFilter.byDate:
+        return Icons.calendar_today;
     }
   }
 
@@ -200,6 +230,8 @@ class _PredictionsScreenState extends ConsumerState<PredictionsScreen> {
         return 'Upcoming';
       case PredictionFilter.past:
         return 'Past';
+      case PredictionFilter.byDate:
+        return DateFormat('MMM dd').format(_selectedDate);
     }
   }
 
