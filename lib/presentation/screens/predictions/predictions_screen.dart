@@ -31,16 +31,15 @@ class _PredictionsScreenState extends ConsumerState<PredictionsScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilterOptions(context),
-            tooltip: 'Filter',
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.calendar_today),
             onPressed: () {
+              setState(() {
+                _selectedDate = DateTime.now();
+                _currentFilter = PredictionFilter.byDate;
+              });
               ref.invalidate(allPredictionsProvider);
             },
-            tooltip: 'Refresh',
+            tooltip: 'Today',
           ),
         ],
       ),
