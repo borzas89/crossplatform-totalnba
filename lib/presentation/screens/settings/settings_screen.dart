@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/settings_provider.dart';
+import '../totalstats/totalstats_webview_screen.dart';
 
 /// Settings screen - App configuration and preferences
 class SettingsScreen extends ConsumerWidget {
@@ -73,6 +74,23 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Language selection - Coming soon')),
+              );
+            },
+          ),
+          const Divider(),
+
+          // TotalStats Website
+          ListTile(
+            leading: const Icon(Icons.public),
+            title: const Text('TotalStats'),
+            subtitle: const Text('Visit our website'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TotalStatsWebViewScreen(),
+                ),
               );
             },
           ),
