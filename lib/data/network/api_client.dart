@@ -6,6 +6,8 @@ import '../models/predicted_match_dto.dart';
 import '../models/player_stat_dto.dart';
 import '../models/nba_player_dto.dart';
 import '../models/result_dto.dart';
+import '../models/adjustment_dto.dart';
+import '../models/overall_dto.dart';
 
 part 'api_client.g.dart';
 
@@ -77,5 +79,26 @@ abstract class ApiClient {
   @GET(AppConstants.allResultsByTeamEndpoint)
   Future<List<ResultDto>> getResultsByTeam(
     @Query('teamName') String teamName,
+  );
+
+  // ===== Overalls =====
+
+  /// Get overall statistics for both teams (by FULL team names)
+  /// Example: homeName="Oklahoma City Thunder", awayName="Houston Rockets"
+  /// Returns array of 2 OverallDto objects: [home, away]
+  @GET(AppConstants.overallsByTeamsEndpoint)
+  Future<List<OverallDto>> getOverallsByTeams(
+    @Query('homeName') String homeTeamName,
+    @Query('awayName') String awayTeamName,
+  );
+
+  // ===== Adjustments =====
+
+  /// Get adjustment data for a single team (by team alias)
+  /// Example: teamName="HOU" or "OKC"
+  /// Returns single AdjustmentDto object
+  @GET(AppConstants.adjustmentsByTeamEndpoint)
+  Future<AdjustmentDto> getAdjustmentByTeam(
+    @Query('teamName') String teamAlias,
   );
 }

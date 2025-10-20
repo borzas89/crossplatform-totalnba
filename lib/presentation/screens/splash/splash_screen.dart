@@ -62,13 +62,6 @@ class _SplashScreenState extends State<SplashScreen> {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'AI-Powered NBA Predictions',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
-            ),
           ],
         ),
       ),

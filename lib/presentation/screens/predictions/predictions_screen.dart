@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../providers/prediction_provider.dart';
 import '../../../data/models/predicted_match_dto.dart';
+import '../../widgets/match_analysis_bottom_sheet.dart';
 
 enum PredictionFilter { all, today, upcoming, past }
 
@@ -311,7 +312,7 @@ class _PredictionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () {
-          context.push('/match-details/${prediction.commonMatchId}');
+          MatchAnalysisBottomSheet.show(context, prediction);
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
