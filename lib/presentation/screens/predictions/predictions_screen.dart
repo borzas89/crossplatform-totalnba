@@ -209,7 +209,8 @@ class _PredictionsScreenState extends ConsumerState<PredictionsScreen> {
         // Will be handled by Riverpod
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        // Add bottom padding for floating navigation bar (height + margin)
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         itemCount: predictions.length,
         itemBuilder: (context, index) {
           final prediction = predictions[index];
